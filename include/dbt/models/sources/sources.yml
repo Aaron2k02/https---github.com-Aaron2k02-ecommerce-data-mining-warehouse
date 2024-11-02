@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: ecom
+    database: data-mining-warehouse-ecom # Put the project id!
+
+    tables:
+      - name: cities
+			- name: customers
+      - name: merchants
+      - name: transactions

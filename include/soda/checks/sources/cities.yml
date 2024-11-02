@@ -1,0 +1,7 @@
+checks for cities:
+  - schema:
+      fail:
+        when required column missing: [city_id, city_name]
+        when wrong column type:
+          city_id: integer
+          city_name: string

@@ -1,0 +1,9 @@
+checks for customers:
+  - schema:
+      fail:
+        when required column missing: [customer_id, join_date, city_id, gender_id]
+        when wrong column type:
+          customer_id: integer
+          join_date: date
+          city_id: integer
+          gender_id: integer

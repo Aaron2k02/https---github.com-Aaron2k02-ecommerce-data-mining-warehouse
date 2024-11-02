@@ -1,0 +1,7 @@
+name: 'ecom-data-mining-warehousing'
+
+profile: 'ecom'
+
+models:
+  retail:
+    materialized: table

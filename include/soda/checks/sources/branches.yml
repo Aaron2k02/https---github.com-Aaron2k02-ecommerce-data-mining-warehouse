@@ -1,0 +1,7 @@
+checks for branches:
+  - schema:
+      fail:
+        when required column missing: [branch_id, merchant_id]
+        when wrong column type:
+          branch_id: integer
+          merchant_id: integer

@@ -5,6 +5,8 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 import os
 
+from airflow.decorators import task  # Import task for TaskFlow API
+
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyDatasetOperator
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
@@ -19,7 +21,6 @@ GCS_CONN_ID = 'data_warehouse'  # Airflow connection ID for GCP
 BIGQUERY_DATASET = 'ecom'  # BigQuery dataset name
 
 # Define the Python function to upload files to GCS
-# Define the Python function to upload files to GCS
 def upload_to_gcs(data_folder, gcs_path, **kwargs):
     bucket_name = 'u2102810_ecom_dataset'  # Your GCS bucket name
     gcs_conn_id = 'data_warehouse'  # Airflow connection ID for GCP
@@ -30,32 +31,17 @@ def upload_to_gcs(data_folder, gcs_path, **kwargs):
     # Upload each CSV file to GCS
     for csv_file in csv_files:
         local_file_path = os.path.join(data_folder, csv_file)
+        gcs_file_path = f"{gcs_path}/{csv_file}"
 
-        # Create a standardized GCS file path
-        standardized_file_name = csv_file.lower().replace(" ", "_").replace(".", "_")
-        gcs_file_path = f"{gcs_path}/{standardized_file_name}"
-
-        # Update the CSV file's column names in place
-        df = pd.read_csv(local_file_path)
-        df.columns = [col.lower().replace(" ", "_").replace(".", "_") for col in df.columns]
-        updated_local_file_path = os.path.join(data_folder, f"updated_{standardized_file_name}")
-
-        # Save the updated DataFrame to a new CSV file
-        df.to_csv(updated_local_file_path, index=False)
-
-        # Create and execute the upload task
         upload_task = LocalFilesystemToGCSOperator(
-            task_id=f'upload_{standardized_file_name.split(".")[0]}_to_gcs',
-            src=updated_local_file_path,
+            task_id=f'upload_{csv_file.split(".")[0]}_to_gcs',
+            src=local_file_path,
             dst=gcs_file_path,
             bucket=bucket_name,
             gcp_conn_id=gcs_conn_id,
             mime_type='text/csv'
         )
-        upload_task.execute(context=kwargs)  # Executes each upload task
-
-        # Optional: Remove the updated local file after upload
-        os.remove(updated_local_file_path)
+        upload_task.execute(context=kwargs)  # Executes each upload task\
     
 def load_data_to_bq(**kwargs):
         gcs_hook = GCSHook(gcp_conn_id=GCS_CONN_ID)
@@ -78,7 +64,7 @@ def load_data_to_bq(**kwargs):
             df = pd.read_csv(StringIO(decoded_file_data))
 
             # Rename columns to a consistent naming convention
-            df.columns = [col.lower().replace(".", "_").replace(" ", "_").replace("(", "_").replace(")", "_") for col in df.columns]
+            df.columns = [col.lower().replace(".", "_").replace(" ", "_").replace("(", "_").replace(")", "") for col in df.columns]
             
             logging.info(f"Files in GCS column name: {df.columns}")
 
@@ -115,6 +101,13 @@ def load_data_to_bq(**kwargs):
                 # Remove temporary file from GCS
                 gcs_hook.delete(bucket_name=BUCKET_NAME, object_name=temp_file_path)
 
+# Define an independent Python function to run in an external environment
+@task.external_python(python='/usr/local/airflow/soda_venv/bin/python')
+def check_staging_data_soda(scan_name='check_load', checks_subpath='sources'):
+    from include.soda.check_function import check
+
+    return check(scan_name, checks_subpath)
+
 # Define your DAG
 with DAG(
     'upload_files_and_create_bq_dataset',
@@ -139,12 +132,19 @@ with DAG(
         gcp_conn_id='data_warehouse',
     )
     
-     # Task to load files from GCS to BigQuery
+    # Task to load files from GCS to BigQuery
     gcs_to_bq_load = PythonOperator(
         task_id='load_data_to_bq',
         python_callable=load_data_to_bq,
         provide_context=True,
     )
+    
+    # Task to load files from GCS to BigQuery
+    check_staging_data = PythonOperator(
+        task_id='check_staging_data_soda',
+        python_callable=check_staging_data_soda,
+        provide_context=True,
+    )
 
     # Define task dependencies
-    upload_csvs_task >> create_ecom_dataset >> gcs_to_bq_load
+    upload_csvs_task >> create_ecom_dataset >> gcs_to_bq_load >> check_staging_data

@@ -1,0 +1,15 @@
+data_source ecom:
+  type: bigquery
+  connection:
+    account_info_json_path: /usr/local/airflow/include/gcp/service_account.json
+    auth_scopes:
+      - https://www.googleapis.com/auth/bigquery
+      - https://www.googleapis.com/auth/cloud-platform
+      - https://www.googleapis.com/auth/drive
+    project_id: 'data-mining-warehouse-ecom'
+    dataset: ecom
+
+soda_cloud:
+  host: cloud.soda.io
+  api_key_id: 359dec8b-1d43-46ce-b796-1d17db975c49
+  api_key_secret: nrVlUxiMkGtjp06mikuHfwAk0d4aNBdf3VGx5tfSmB4UUZPsQo61Hg

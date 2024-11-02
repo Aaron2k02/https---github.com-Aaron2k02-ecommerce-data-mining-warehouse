@@ -1,0 +1,61 @@
+checks for transactions:
+  - schema:
+      fail:
+        # Specify required columns that must be present in the table
+        when required column missing: [
+          index, 
+          transaction_id, 
+          customer_id, 
+          transaction_date, 
+          transaction_status, 
+          coupon_name, 
+          burn_date, 
+          branch_id, 
+          redemption_status,
+          customers_df_city_id,
+          customers_df_gender_id,
+          branches_df_merchant_id,
+          customers_df_count_transactions_df_,
+          customers_df_mode_transactions_df_transaction_status_,
+          customers_df_num_unique_transactions_df_transaction_status_,
+          month_transaction_date_,
+          year_transaction_date_,
+          weekday_transaction_date_,
+          customers_df_num_unique_transactions_df_month_transaction_date__,
+          month_burn_date_,
+          year_burn_date_,
+          weekday_burn_date_,
+          branches_df_merchants_df_count_transactions_df_,
+          branches_df_merchants_df_mode_transactions_df_transaction_status_,
+          customers_df_mode_transactions_df_month_burn_date__,
+          customers_df_mode_transactions_df_weekday_burn_date__
+        ]
+        
+        # Specify expected column data types for schema validation
+        when wrong column type:
+          index: integer
+          transaction_id: integer
+          customer_id: integer
+          transaction_date: date
+          transaction_status: string
+          coupon_name: string
+          burn_date: date
+          branch_id: integer
+          redemption_status: string
+          customers_df_city_id: integer
+          customers_df_gender_id: integer
+          branches_df_merchant_id: integer
+          customers_df_count_transactions_df_: integer
+          customers_df_mode_transactions_df_transaction_status_: string
+          customers_df_num_unique_transactions_df_transaction_status_: integer
+          month_transaction_date_: integer
+          year_transaction_date_: integer
+          weekday_transaction_date_: integer
+          customers_df_num_unique_transactions_df_month_transaction_date__: integer
+          month_burn_date_: FLOAT64
+          year_burn_date_: FLOAT64
+          weekday_burn_date_: FLOAT64
+          branches_df_merchants_df_count_transactions_df_: integer
+          branches_df_merchants_df_mode_transactions_df_transaction_status_: string
+          customers_df_mode_transactions_df_month_burn_date__: FLOAT64
+          customers_df_mode_transactions_df_weekday_burn_date__: FLOAT64
