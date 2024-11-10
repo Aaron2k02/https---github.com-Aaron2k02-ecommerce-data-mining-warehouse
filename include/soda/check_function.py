@@ -8,6 +8,7 @@ def check(scan_name, checks_subpath=None, data_source='ecom', project_root='incl
 
     if checks_subpath:
         checks_path += f'/{checks_subpath}'
+        print("checks_path",checks_path)
 
     scan = Scan()
     scan.set_verbose()
@@ -21,5 +22,6 @@ def check(scan_name, checks_subpath=None, data_source='ecom', project_root='incl
 
     if result != 0:
         raise ValueError('Soda Scan failed')
-
-    return result
+    
+    # Return a JSON serializable result
+    return {"scan_name": scan_name, "result_code": result}

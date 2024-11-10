@@ -3,5 +3,5 @@ checks for branches:
       fail:
         when required column missing: [branch_id, merchant_id]
         when wrong column type:
-          branch_id: integer
+          branch_id: string
           merchant_id: integer

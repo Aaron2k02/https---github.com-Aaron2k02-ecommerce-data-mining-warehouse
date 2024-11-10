@@ -1,7 +1,12 @@
-name: 'ecom-data-mining-warehousing'
+# dbt_project.yml
+
+name: 'ecom'  # Replace hyphens with underscores
+version: 2
+
+packages-install-path: ../packages
 
 profile: 'ecom'
 
 models:
-  retail:
+  ecom:
     materialized: table

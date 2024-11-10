@@ -4,7 +4,7 @@ ecom:
   dev:
     type: bigquery
     method: service-account
-    keyfile: /usr/local/airflow/include/gcp/service_account.json
+    keyfile: /usr/local/airflow/include/gcp/service_account.json 
     project: data-mining-warehouse-ecom
     dataset: ecom
     threads: 1

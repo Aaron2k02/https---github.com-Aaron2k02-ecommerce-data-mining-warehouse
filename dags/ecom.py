@@ -8,17 +8,32 @@ import os
 from airflow.decorators import task  # Import task for TaskFlow API
 
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
-from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyDatasetOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyDatasetOperator, BigQueryInsertJobOperator
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 
 import pandas as pd
 from io import StringIO
 
+# Read SQL query from the dim_cities_query.sql file
+def read_sql_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+    
+ # Read SQL query for data modelling
+dim_cities_query = read_sql_file('/usr/local/airflow/include/transform/dim_cities_query.sql')
+dim_customer_query = read_sql_file('/usr/local/airflow/include/transform/dim_customer_query.sql')
+dim_date_query = read_sql_file('/usr/local/airflow/include/transform/dim_date_query.sql')
+dim_gender_query = read_sql_file('/usr/local/airflow/include/transform/dim_gender_query.sql')
+dim_merchant_query = read_sql_file('/usr/local/airflow/include/transform/dim_merchant_query.sql')
+fact_transactions_query = read_sql_file('/usr/local/airflow/include/transform/fact_transactions_query.sql')
+
 # Define constants
 BUCKET_NAME = 'u2102810_ecom_dataset'  # Your GCS bucket name
 GCS_PATH = 'raw'  # Folder in GCS bucket
 GCS_CONN_ID = 'data_warehouse'  # Airflow connection ID for GCP
-BIGQUERY_DATASET = 'ecom'  # BigQuery dataset name
+BIGQUERY_DATASET = 'ecom_stg'  # BigQuery dataset name
+BIGQUERY_DATASET_PROD = 'ecom_prod' 
+PROJECT_ID = 'data-mining-warehouse-ecom'
 
 # Define the Python function to upload files to GCS
 def upload_to_gcs(data_folder, gcs_path, **kwargs):
@@ -103,10 +118,12 @@ def load_data_to_bq(**kwargs):
 
 # Define an independent Python function to run in an external environment
 @task.external_python(python='/usr/local/airflow/soda_venv/bin/python')
-def check_staging_data_soda(scan_name='check_load', checks_subpath='sources'):
+def check_staging_data_soda(scan_name='check_staging_data_soda', checks_subpath='sources'):
     from include.soda.check_function import check
 
-    return check(scan_name, checks_subpath)
+   # Ensure the check function returns a JSON-serializable result
+    result = check(scan_name, checks_subpath)
+    return result.get("result_code")  # Return only the result code for simplicity
 
 # Define your DAG
 with DAG(
@@ -125,12 +142,12 @@ with DAG(
         provide_context=True,
     )
     
-    # Task to create an empty BigQuery dataset
-    create_ecom_dataset = BigQueryCreateEmptyDatasetOperator(
-        task_id='create_ecom_dataset',
-        dataset_id='ecom',  # Name of the dataset in BigQuery
-        gcp_conn_id='data_warehouse',
-    )
+    # Task to create an empty BigQuery dataset no need since the load data to bigquery can auto detect the schema
+    # create_ecom_dataset = BigQueryCreateEmptyDatasetOperator(
+    #     task_id='create_ecom_stg_dataset',
+    #     dataset_id=BIGQUERY_DATASET,  # Name of the dataset in BigQuery
+    #     gcp_conn_id='data_warehouse',
+    # )
     
     # Task to load files from GCS to BigQuery
     gcs_to_bq_load = PythonOperator(
@@ -144,7 +161,40 @@ with DAG(
         task_id='check_staging_data_soda',
         python_callable=check_staging_data_soda,
         provide_context=True,
+        do_xcom_push=False  # Prevents result from being pushed to XCom
     )
+    
+    # Helper function to create transformation SQL task
+    def create_sql_task(task_id, sql_query):
+        return BigQueryInsertJobOperator(
+            task_id=task_id,
+            location="US",
+            project_id='data-mining-warehouse-ecom',
+            gcp_conn_id=GCS_CONN_ID,
+            configuration={
+                "query": {
+                    "query": sql_query,
+                    "useLegacySql": False,
+                    "defaultDataset": {
+                        "projectId": PROJECT_ID,
+                        "datasetId": BIGQUERY_DATASET_PROD,
+                        "tableId": task_id.split('_')[1],
+                    },
+                    # "writeDisposition": "WRITE_TRUNCATE",
+                    "autodetect": True 
+                }
+            },
+        )
+
+    # # Create tasks for each SQL transformation
+    dim_cities_task = create_sql_task('transform_dim_cities', dim_cities_query)
+    dim_customer_task = create_sql_task('transform_dim_customer', dim_customer_query)
+    dim_date_task = create_sql_task('transform_dim_date', dim_date_query)
+    dim_gender_task = create_sql_task('transform_dim_gender', dim_gender_query)
+    dim_merchant_task = create_sql_task('transform_dim_merchant', dim_merchant_query)
+    fact_transactions_task = create_sql_task('transform_fact_transactions', fact_transactions_query)
 
     # Define task dependencies
-    upload_csvs_task >> create_ecom_dataset >> gcs_to_bq_load >> check_staging_data
+    upload_csvs_task >> gcs_to_bq_load >> check_staging_data
+    gcs_to_bq_load >> [dim_cities_task, dim_customer_task, dim_date_task, dim_gender_task, dim_merchant_task] >> fact_transactions_task
+    
