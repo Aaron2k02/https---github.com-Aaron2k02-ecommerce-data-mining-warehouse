@@ -1,7 +1,7 @@
 CREATE OR REPLACE TABLE `data-mining-warehouse-ecom.ecom_prod.fact_transactions` AS
     WITH fact_transactions_cte AS (
         SELECT
-            index,
+            -- index,
             transaction_id,
             customer_id,
             transaction_date,
@@ -24,13 +24,18 @@ CREATE OR REPLACE TABLE `data-mining-warehouse-ecom.ecom_prod.fact_transactions`
         FROM `data-mining-warehouse-ecom.ecom_stg.transactions`
     )
 SELECT
-    ft.index,
+    -- ft.index,
     ft.transaction_id,
     dc.customer_id,
     dm.merchant_id,
     dg.gender_id,
     dci.city_id,
     dtd.id AS transaction_date_id,
+    ft.transaction_status,
+    ft.burn_date,
+    ft.coupon_name,
+    ft.branch_id,
+    ft.redemption_status,
     ft.count_transactions,
     ft.mode_transaction_status,
     ft.num_unique_transaction_status,
