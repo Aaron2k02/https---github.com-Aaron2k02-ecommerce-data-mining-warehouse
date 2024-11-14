@@ -8,7 +8,6 @@ CREATE OR REPLACE TABLE `data-mining-warehouse-ecom.ecom_prod.fact_transactions`
             burn_date,
             transaction_status,
             coupon_name,
-            branch_id,
             redemption_status,
             customers_df_city_id AS city_id,
             customers_df_gender_id AS gender_id,
@@ -30,11 +29,10 @@ SELECT
     dm.merchant_id,
     dg.gender_id,
     dci.city_id,
-    dtd.id AS transaction_date_id,
+    dtd.date_id AS transaction_date_id,
     ft.transaction_status,
     ft.burn_date,
     ft.coupon_name,
-    ft.branch_id,
     ft.redemption_status,
     ft.count_transactions,
     ft.mode_transaction_status,
@@ -49,5 +47,5 @@ INNER JOIN `data-mining-warehouse-ecom.ecom_prod.dim_customer` dc ON ft.customer
 INNER JOIN `data-mining-warehouse-ecom.ecom_prod.dim_merchant` dm ON ft.merchant_id = dm.merchant_id
 INNER JOIN `data-mining-warehouse-ecom.ecom_prod.dim_gender` dg ON ft.gender_id = dg.gender_id
 INNER JOIN `data-mining-warehouse-ecom.ecom_prod.dim_cities` dci ON ft.city_id = dci.city_id
-INNER JOIN `data-mining-warehouse-ecom.ecom_prod.dim_date` dtd ON ft.transaction_date = CAST(dtd.id AS DATE)
+INNER JOIN `data-mining-warehouse-ecom.ecom_prod.dim_date` dtd ON ft.transaction_date = CAST(dtd.date_id AS DATE)
 ORDER BY ft.transaction_date

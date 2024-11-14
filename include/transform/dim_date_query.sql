@@ -14,7 +14,7 @@ CREATE OR REPLACE TABLE `data-mining-warehouse-ecom.ecom_prod.dim_date` AS (
         )) AS d
     )
     SELECT
-        FORMAT_DATE('%F', d) AS id,
+        FORMAT_DATE('%F', d) AS date_id,
         d AS full_date,
         EXTRACT(YEAR FROM d) AS year,
         EXTRACT(WEEK FROM d) AS year_week,
