@@ -26,7 +26,7 @@ fact_transactions_final AS (
         dg.gender_id,
         dci.city_id,
         ft.transaction_status,
-        ft.transaction_date AS transaction_date_id,
+        ft.transaction_date AS transaction_date,
         ft.burn_date AS burn_date,
         ft.coupon_name,
         ft.redemption_status
@@ -42,4 +42,4 @@ fact_transactions_final AS (
 -- Final ordered selection
 SELECT * 
 FROM fact_transactions_final
-ORDER BY transaction_date_id;
+ORDER BY transaction_date;
