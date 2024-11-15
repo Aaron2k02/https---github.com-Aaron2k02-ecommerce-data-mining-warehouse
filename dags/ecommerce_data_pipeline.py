@@ -47,7 +47,7 @@ dim_customer_query = read_sql_file('/usr/local/airflow/include/transform/dim_cus
 dim_date_query = read_sql_file('/usr/local/airflow/include/transform/dim_date_query.sql')
 dim_gender_query = read_sql_file('/usr/local/airflow/include/transform/dim_gender_query.sql')
 dim_merchant_query = read_sql_file('/usr/local/airflow/include/transform/dim_merchant_query.sql')
-fact_transactions_query = read_sql_file('/usr/local/airflow/include/transform/dynamic_fact_transactions_query.sql')
+fact_transactions_query = read_sql_file('/usr/local/airflow/include/transform/fact_transactions_query.sql')
 
 # Define the Python function to upload files to GCS
 def upload_to_gcs(data_folder, gcs_path, **kwargs):
