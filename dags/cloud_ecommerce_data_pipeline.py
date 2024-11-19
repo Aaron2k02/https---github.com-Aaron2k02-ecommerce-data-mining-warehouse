@@ -261,4 +261,4 @@ with DAG(
     
     # # Chain the loading tasks
     
-    chain(publish_task, pull_task, load_transactions_task,dim_cities_task, dim_customer_task, dim_date_task, dim_gender_task, dim_merchant_task, fact_transactions_task)
+    chain(publish_task, pull_task, load_transactions_task,[dim_cities_task, dim_customer_task, dim_date_task, dim_gender_task, dim_merchant_task], fact_transactions_task)

@@ -19,7 +19,7 @@
 # from io import StringIO  # For handling in-memory text streams
 
 # # Define constants for GCS and BigQuery configurations
-# COMPOSER_BUCKET_NAME = 'us-central1-ecommerce-data--9be224af-bucket'  # GCS bucket name for storing data
+# COMPOSER_BUCKET_NAME = 'us-central1-ecommerce-COMPOSER_BUCKET_NAMEdata--9be224af-bucket'  # GCS bucket name for storing data
 # BUCKET_NAME = 'u2102810_ecom_dataset'  # GCS bucket name for storing data
 # GCS_PATH = 'raw'  # GCS folder path for raw data files
 # # COMPOSER_GCS_CONN_ID = 'google_cloud_default'  # Airflow connection ID for GCS
