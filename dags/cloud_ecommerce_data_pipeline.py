@@ -47,33 +47,44 @@ BIGQUERY_DATASET_PROD = 'ecom_prod'  # BigQuery production dataset name
 PROJECT_ID = 'data-mining-warehouse-ecom'  # GCP project ID
 TOPIC_ID = "transactions"
 SUBSCRIPTION_ID = "transactions-sub"
+COMPOSER_BUCKET_NAME = 'us-central1-u2102810-data-p-aa902636-bucket'
 
 # Initialize Pub/Sub publisher and GCS client
 publisher = pubsub_v1.PublisherClient(credentials=credentials)
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 storage_client = storage.Client(credentials=credentials)
 
-# Helper function to read SQL files for transformations
-def read_sql_file(file_path):
+# # Helper function to read SQL files for transformations
+def read_sql_file_from_gcs(bucket_name, file_path):
     """
-    Read SQL query from a file.
+    Read SQL query from a file in GCS.
 
     Args:
-        file_path (str): Path to the SQL file.
+        bucket_name (str): GCS bucket name.
+        file_path (str): GCS path to the SQL file.
     
     Returns:
         str: The SQL query as a string.
     """
-    with open(file_path, 'r') as file:
-        return file.read()
+    try:
+        gcs_hook = GCSHook(gcp_conn_id=GCS_CONN_ID)
+        logging.info(f"Reading SQL file from GCS: bucket={bucket_name}, path={file_path}")
+        file_data = gcs_hook.download(bucket_name=bucket_name, object_name=file_path)
+        sql_query = file_data.decode('utf-8')
+        logging.info(f"Successfully read SQL file: {file_path}")
+        return sql_query
+    except Exception as e:
+        logging.error(f"Failed to read SQL file from GCS: bucket={bucket_name}, path={file_path}")
+        logging.error(str(e))
+        raise
 
 # Load SQL queries for data transformations
-dim_cities_query = read_sql_file('/usr/local/airflow/include/transform/dim_cities_query.sql')
-dim_customer_query = read_sql_file('/usr/local/airflow/include/transform/dim_customer_query.sql')
-dim_date_query = read_sql_file('/usr/local/airflow/include/transform/dim_date_query.sql')
-dim_gender_query = read_sql_file('/usr/local/airflow/include/transform/dim_gender_query.sql')
-dim_merchant_query = read_sql_file('/usr/local/airflow/include/transform/dim_merchant_query.sql')
-fact_transactions_query = read_sql_file('/usr/local/airflow/include/transform/fact_transactions_query.sql')
+dim_cities_query = read_sql_file_from_gcs(COMPOSER_BUCKET_NAME, 'transform/dim_cities_query.sql')
+dim_customer_query = read_sql_file_from_gcs(COMPOSER_BUCKET_NAME, 'transform/dim_customer_query.sql')
+dim_date_query = read_sql_file_from_gcs(COMPOSER_BUCKET_NAME, 'transform/dim_date_query.sql')
+dim_gender_query = read_sql_file_from_gcs(COMPOSER_BUCKET_NAME, 'transform/dim_gender_query.sql')
+dim_merchant_query = read_sql_file_from_gcs(COMPOSER_BUCKET_NAME, 'transform/dim_merchant_query.sql')
+fact_transactions_query = read_sql_file_from_gcs(COMPOSER_BUCKET_NAME, 'transform/fact_transactions_query.sql')
 
 # Data generation function
 def generate_transaction_data(customer_ids, branch_ids, transaction_id_start=5001):
@@ -259,6 +270,5 @@ with DAG(
     dim_merchant_task = create_sql_task('transform_dim_merchant', dim_merchant_query)
     fact_transactions_task = create_sql_task('transform_fact_transactions', fact_transactions_query)
     
-    # # Chain the loading tasks
-    
-    chain(publish_task, pull_task, load_transactions_task,[dim_cities_task, dim_customer_task, dim_date_task, dim_gender_task, dim_merchant_task], fact_transactions_task)
+     # # Chain the loading tasks
+    chain(publish_task, pull_task, load_transactions_task,dim_cities_task, dim_customer_task, dim_date_task, dim_gender_task, dim_merchant_task, fact_transactions_task)

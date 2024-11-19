@@ -12,7 +12,7 @@ import time
 from google.oauth2 import service_account
 from google.cloud import pubsub_v1
 import logging
-W
+
 # Load credentials from the Airflow connection
 from airflow.hooks.base import BaseHook
 
