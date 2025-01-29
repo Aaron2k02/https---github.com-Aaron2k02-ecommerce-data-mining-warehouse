@@ -17,12 +17,13 @@ This project demonstrates a scalable **ELT (Extract, Load, Transform)** data pip
 ![Pub/Sub Pipeline](https://github.com/user-attachments/assets/32d4d7f6-9847-47a6-9cf9-0109fa379837)  
 
 - **Automated Orchestration**: Leverages **Google Cloud Composer** and **Apache Airflow** for workflow management.  
-![Orchestration](https://github.com/user-attachments/assets/03e6cf30-e3b2-43cd-b078-6dbbece73f47)  
+![image](https://github.com/user-attachments/assets/30f1ddba-e662-40a0-bac6-fdf02e296fc3)
 
 - **Star Schema Modeling**: Structures data for analytics in **BigQuery** with fact and dimension tables.  
-![Star Schema](https://github.com/user-attachments/assets/7bfea2cc-c89a-44b2-9d1d-600e7d7e7012)  
+![Orchestration](https://github.com/user-attachments/assets/03e6cf30-e3b2-43cd-b078-6dbbece73f47)  
 
-- **Governance and Security**: Implements **Role-Based Access Control (RBAC)** and **Row-Level Security (RLS)** via **Google IAM**.  
+- **Governance and Security**: Implements **Role-Based Access Control (RBAC)** and **Row-Level Security (RLS)** via **Google IAM**.
+![Star Schema](https://github.com/user-attachments/assets/7bfea2cc-c89a-44b2-9d1d-600e7d7e7012)
 ![RBAC](https://github.com/user-attachments/assets/745b9876-bcf6-42da-a7bb-f09507a42639)  
 ![RLS Example](https://github.com/user-attachments/assets/6c1e4ee3-d191-4a9f-a3f9-fe79caa88feb)  
 
