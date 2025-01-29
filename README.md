@@ -11,7 +11,7 @@ This project demonstrates an **ELT (Extract, Load, Transform)** data pipeline de
 ## Overview
 
 ### Key Features:
-![Data Mining - Page 1 (16)](https://github.com/user-attachments/assets/ebd6f23b-637f-49a1-a97f-b56770d80e8e)
+![image](https://github.com/user-attachments/assets/5a433a67-0ef6-4c2b-822f-8543e7dd6234)
 - **Data Lakehouse Architecture**: Combines the scalability of a data lake with the structure of a data warehouse.
 ![image](https://github.com/user-attachments/assets/98db7f23-6b39-476d-b683-ee33ef96217b)
 - **Real-Time Data Ingestion**: Simulates transactions using **Python Faker** and **Google Pub/Sub**.
