@@ -22,7 +22,8 @@ This project demonstrates a scalable **ELT (Extract, Load, Transform)** data pip
 - **Star Schema Modeling**: Structures data for analytics in **BigQuery** with fact and dimension tables.  
 ![Orchestration](https://github.com/user-attachments/assets/03e6cf30-e3b2-43cd-b078-6dbbece73f47)  
 
-- **Governance and Security**: Implements **Role-Based Access Control (RBAC)** and **Row-Level Security (RLS)** via **Google IAM**.
+- **Governance and Security**: Implements **Role-Based Access Control (RBAC)** and **Row-Level Security (RLS)** via **Google IAM**. <br />
+
 ![Star Schema](https://github.com/user-attachments/assets/7bfea2cc-c89a-44b2-9d1d-600e7d7e7012)
 ![RBAC](https://github.com/user-attachments/assets/745b9876-bcf6-42da-a7bb-f09507a42639)  
 ![RLS Example](https://github.com/user-attachments/assets/6c1e4ee3-d191-4a9f-a3f9-fe79caa88feb)  
