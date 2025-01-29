@@ -1,5 +1,3 @@
-Here's a cleaner, more professional version of the content that flows better for user presentation:
-
 ---
 
 # ELT Data Pipeline with Google Cloud Platform  
