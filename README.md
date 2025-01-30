@@ -120,5 +120,3 @@ This project highlights a modern, scalable approach to building secure ELT pipel
 ### [View Full Documentation](https://docs.google.com/document/d/1D_wBVQw9YrQJYOZM-uuOSCrAjlNqk_sK2wSJHXJ8sD0/edit?usp=sharing)
 
 ---
-
-Let me know how else you'd like to refine this! 😊
